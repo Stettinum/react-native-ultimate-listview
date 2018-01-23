@@ -196,6 +196,9 @@ export default class RefreshableScrollView extends ScrollView {
         duration: 50,
         easing: Easing.inOut(Easing.quad)
       }).start()
+    } else {
+      this._isRefreshing = false;
+      if(this.state.refreshStatus === 1) this._scrollview.scrollTo({x: 0, y: this.props.refreshViewHeight, animated: true})
     }
   }
 

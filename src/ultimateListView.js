@@ -20,6 +20,8 @@ const PaginationStatus = {
   allLoaded: 2
 }
 
+const endReached = true;
+
 export default class UltimateListView extends Component {
   static defaultProps = {
     initialNumToRender: 10,
@@ -189,8 +191,9 @@ export default class UltimateListView extends Component {
   }
 
   onEndReached = () => {
-    // console.log('onEndReached()');
-    if (this.props.pagination && this.props.autoPagination && this.state.paginationStatus === PaginationStatus.waiting) {
+    if (this.props.pagination && this.props.autoPagination && this.state.paginationStatus === PaginationStatus.waiting && !endReached) {
+      endReached = true
+      console.log('onEndReached()');
       this.onPaginate()
     }
   }
@@ -449,6 +452,7 @@ export default class UltimateListView extends Component {
         onEndReached={this.onEndReached}
         refreshControl={this.renderRefreshControl()}
         numColumns={numColumns}
+        onMomentumScrollEnd={() => { endReached= false; }}
       />
     )
   }

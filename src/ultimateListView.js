@@ -156,7 +156,6 @@ export default class UltimateListView extends Component {
       dataSource: [],
       isRefreshing: false,
       paginationStatus: PaginationStatus.firstLoad,
-      firstRows: []
     }
   }
 
@@ -236,7 +235,6 @@ export default class UltimateListView extends Component {
       if (rows.length < pageLimit) {
         paginationStatus = PaginationStatus.allLoaded
       }
-      this.setState({firstRows: rows});
       this.updateRows(rows, paginationStatus)
     }
   }

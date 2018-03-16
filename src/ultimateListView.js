@@ -151,12 +151,12 @@ export default class UltimateListView extends Component {
   constructor(props) {
     super(props)
     this.setPage(1)
-    this.setRows([])
 
     this.state = {
       dataSource: [],
       isRefreshing: false,
-      paginationStatus: PaginationStatus.firstLoad
+      paginationStatus: PaginationStatus.firstLoad,
+      firstRows: []
     }
   }
 
@@ -182,9 +182,9 @@ export default class UltimateListView extends Component {
     }
   }
 
+
   onPaginate = () => {
     if (this.state.paginationStatus !== PaginationStatus.allLoaded && !this.state.isRefreshing) {
-      console.log('onPaginate()')
       this.setState({ paginationStatus: PaginationStatus.waiting })
       this.props.onFetch(this.getPage() + 1, this.postPaginate, this.endFetch)
     }
@@ -192,9 +192,9 @@ export default class UltimateListView extends Component {
 
   onEndReached = () => {
     if (this.props.pagination && this.props.autoPagination && this.state.paginationStatus === PaginationStatus.waiting && !endReached) {
-      endReached = true
-      console.log('onEndReached()');
+      console.log('onEndReached()', this.getRows());
       this.onPaginate()
+      endReached = true
     }
   }
 
@@ -202,7 +202,9 @@ export default class UltimateListView extends Component {
 
   getPage = () => this.page
 
-  setRows = rows => this.rows = rows
+  setRows = rows => {
+    this.rows = rows
+  }
 
   getRows = () => this.rows
 
@@ -234,12 +236,13 @@ export default class UltimateListView extends Component {
       if (rows.length < pageLimit) {
         paginationStatus = PaginationStatus.allLoaded
       }
+      this.setState({firstRows: rows});
       this.updateRows(rows, paginationStatus)
     }
   }
 
   endFetch = () => {
-    // console.log('endRefresh()');
+    console.log('endRefresh()');
     if (this.mounted) {
       this.setState({ isRefreshing: false })
       if (this.props.refreshableMode === 'advanced' && this._flatList._listRef._scrollRef.onRefreshEnd) {
@@ -252,13 +255,14 @@ export default class UltimateListView extends Component {
     this.setPage(this.getPage() + 1)
     let mergedRows
     let paginationStatus
+
+
     if (rows.length === 0) {
       paginationStatus = PaginationStatus.allLoaded
     } else {
       mergedRows = this.getRows().concat(rows)
       paginationStatus = PaginationStatus.waiting
     }
-
     this.updateRows(mergedRows, paginationStatus)
   }
 
@@ -281,13 +285,6 @@ export default class UltimateListView extends Component {
     if (this.props.refreshableMode === 'advanced') {
       this.endFetch()
     }
-  }
-
-  updateDataSource(rows = []) {
-    this.setRows(rows)
-    this.setState({
-      dataSource: rows
-    })
   }
 
   paginationFetchingView = () => {
@@ -452,7 +449,7 @@ export default class UltimateListView extends Component {
         onEndReached={this.onEndReached}
         refreshControl={this.renderRefreshControl()}
         numColumns={numColumns}
-        onMomentumScrollEnd={() => { endReached= false; }}
+        onMomentumScrollBegin={() => { endReached= false; }}
       />
     )
   }

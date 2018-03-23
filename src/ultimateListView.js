@@ -82,7 +82,10 @@ export default class UltimateListView extends Component {
     paginationBtnText: 'Load more...',
 
     // GridView
-    numColumns: 1
+    numColumns: 1,
+
+    onEmptyList: () => {},
+    onRefresh: () => {}
   }
 
   static propTypes = {
@@ -145,7 +148,10 @@ export default class UltimateListView extends Component {
     paginationBtnText: PropTypes.string,
 
     // GridView
-    numColumns: PropTypes.number
+    numColumns: PropTypes.number,
+
+    onEmptyList: PropTypes.func,
+    onRefresh: PropTypes.func,
   }
 
   constructor(props) {
@@ -177,6 +183,7 @@ export default class UltimateListView extends Component {
         isRefreshing: true
       })
       this.setPage(1)
+      this.props.onRefresh();
       this.props.onFetch(this.getPage(), this.postRefresh, this.endFetch)
     }
   }
@@ -191,7 +198,6 @@ export default class UltimateListView extends Component {
 
   onEndReached = () => {
     if (this.props.pagination && this.props.autoPagination && this.state.paginationStatus === PaginationStatus.waiting && !endReached) {
-      console.log('onEndReached()', this.getRows());
       this.onPaginate()
       endReached = true
     }
@@ -262,6 +268,14 @@ export default class UltimateListView extends Component {
       paginationStatus = PaginationStatus.waiting
     }
     this.updateRows(mergedRows, paginationStatus)
+  }
+
+  forceUpdateRows = rows => {
+    this.setRows(rows);
+    this.setState({
+      dataSource: rows,
+      isRefreshing: false,
+    })
   }
 
   updateRows = (rows, paginationStatus) => {
@@ -374,11 +388,13 @@ export default class UltimateListView extends Component {
   }
 
   renderFooter = () => {
+    if(this.state.paginationStatus !== PaginationStatus.firstLoad && this.getRows().length === 0) this.props.onEmptyList()
+
     if (this.state.paginationStatus === PaginationStatus.firstLoad) {
       return this.paginationFetchingView()
     } else if (this.state.paginationStatus === PaginationStatus.waiting && this.props.autoPagination === false) {
       return this.paginationWaitingView(this.onPaginate)
-    } else if (this.state.paginationStatus === PaginationStatus.waiting && this.props.autoPagination === true) {
+    } else if (this.state.paginationStatus === PaginationStatus.waiting && this.props.autoPagination === true && this.getRows().length >= this.props.initialNumToRender) {
       return this.paginationWaitingView()
     } else if (this.getRows().length !== 0 && this.state.paginationStatus === PaginationStatus.allLoaded) {
       return this.paginationAllLoadedView()

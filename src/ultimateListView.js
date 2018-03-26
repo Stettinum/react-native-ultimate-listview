@@ -382,6 +382,8 @@ export default class UltimateListView extends Component {
   renderEmptyView = () => {
     if (this.state.paginationStatus !== PaginationStatus.firstLoad && this.props.emptyView) {
       return this.props.emptyView()
+    } else if (this.getRows() && !this.props.firstLoad && this.getRows().length === 0) {
+      return this.props.emptyView()
     }
 
     return null

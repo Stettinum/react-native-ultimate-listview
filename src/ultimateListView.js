@@ -260,8 +260,7 @@ export default class UltimateListView extends Component {
     let mergedRows
     let paginationStatus
 
-
-    if (rows.length === 0) {
+    if (rows.length === 0 || rows.length < this.props.initialNumToRender) {
       paginationStatus = PaginationStatus.allLoaded
     } else {
       mergedRows = this.getRows().concat(rows)

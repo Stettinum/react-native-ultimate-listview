@@ -19,7 +19,7 @@ const PaginationStatus = {
   allLoaded: 2
 };
 
-let endReached = true;
+let endReached = false;
 
 export default class UltimateListView extends Component {
   static defaultProps = {
